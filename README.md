@@ -213,7 +213,11 @@ VITE_BACKEND_URL=http://localhost:8000
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project was created for the **Google Maps Platform Hackathon 2025**.
+
+**Team:** Map Memoir Development Team  
+**Built with:** React, Flask, Google Maps Platform, AI Services  
+**Purpose:** Demonstrate innovative use of mapping technology for storytelling
 
 ---
 
