@@ -1,0 +1,95 @@
+{
+  "earth_studio_json": "{\n  \"version\": \"1.0\",\n  \"project\": {\n    \"name\": \"European Capitals\",\n    \"duration\": 17.0,\n    \"fps\": 30,\n    \"resolution\": {\n      \"width\": 1920,\n      \"height\": 1080\n    }\n  },\n  \"timeline\": {\n    \"tracks\": [\n      {\n        \"name\": \"Camera\",\n        \"type\": \"camera\",\n        \"keyframes\": [\n          {\n            \"time\": 3.0,\n            \"value\": {\n              \"position\": {\n                \"lat\": 51.5074,\n                \"lng\": -0.1278,\n                \"altitude\": 25000.0\n              },\n              \"rotation\": {\n                \"heading\": 0.0,\n                \"tilt\": 60.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          },\n          {\n            \"time\": 5.0,\n            \"value\": {\n              \"position\": {\n                \"lat\": 51.5074,\n                \"lng\": -0.1278,\n                \"altitude\": 20000.0\n              },\n              \"rotation\": {\n                \"heading\": 15.0,\n                \"tilt\": 60.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          },\n          {\n            \"time\": 7.1,\n            \"value\": {\n              \"position\": {\n                \"lat\": 48.8566,\n                \"lng\": 2.3522,\n                \"altitude\": 35000.0\n              },\n              \"rotation\": {\n                \"heading\": 45.0,\n                \"tilt\": 45.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          },\n          {\n            \"time\": 8.0,\n            \"value\": {\n              \"position\": {\n                \"lat\": 48.8566,\n                \"lng\": 2.3522,\n                \"altitude\": 17500.0\n              },\n              \"rotation\": {\n                \"heading\": 45.0,\n                \"tilt\": 55.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          },\n          {\n            \"time\": 10.0,\n            \"value\": {\n              \"position\": {\n                \"lat\": 48.8566,\n                \"lng\": 2.3522,\n                \"altitude\": 14000.0\n              },\n              \"rotation\": {\n                \"heading\": 60.0,\n                \"tilt\": 55.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          },\n          {\n            \"time\": 12.1,\n            \"value\": {\n              \"position\": {\n                \"lat\": 41.9028,\n                \"lng\": 12.4964,\n                \"altitude\": 100000.0\n              },\n              \"rotation\": {\n                \"heading\": 90.0,\n                \"tilt\": 45.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          },\n          {\n            \"time\": 13.0,\n            \"value\": {\n              \"position\": {\n                \"lat\": 41.9028,\n                \"lng\": 12.4964,\n                \"altitude\": 50000.0\n              },\n              \"rotation\": {\n                \"heading\": 90.0,\n                \"tilt\": 30.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          },\n          {\n            \"time\": 15.0,\n            \"value\": {\n              \"position\": {\n                \"lat\": 41.9028,\n                \"lng\": 12.4964,\n                \"altitude\": 40000.0\n              },\n              \"rotation\": {\n                \"heading\": 105.0,\n                \"tilt\": 30.0,\n                \"roll\": 0.0\n              }\n            },\n            \"interpolation\": \"ease_in_out\"\n          }\n        ]\n      }\n    ]\n  },\n  \"effects\": [\n    {\n      \"name\": \"Atmosphere\",\n      \"enabled\": true\n    },\n    {\n      \"name\": \"Motion Blur\",\n      \"enabled\": true\n    }\n  ]\n}",
+  "message": "Quick demo project created: European Capitals",
+  "project": {
+    "duration": 17.0,
+    "keyframes": [
+      {
+        "altitude": 25000.0,
+        "heading": 0.0,
+        "latitude": 51.5074,
+        "longitude": -0.1278,
+        "roll": 0.0,
+        "tilt": 60.0,
+        "time": 3.0
+      },
+      {
+        "altitude": 20000.0,
+        "heading": 15.0,
+        "latitude": 51.5074,
+        "longitude": -0.1278,
+        "roll": 0.0,
+        "tilt": 60.0,
+        "time": 5.0
+      },
+      {
+        "altitude": 35000.0,
+        "heading": 45.0,
+        "latitude": 48.8566,
+        "longitude": 2.3522,
+        "roll": 0.0,
+        "tilt": 45.0,
+        "time": 7.1
+      },
+      {
+        "altitude": 17500.0,
+        "heading": 45.0,
+        "latitude": 48.8566,
+        "longitude": 2.3522,
+        "roll": 0.0,
+        "tilt": 55.0,
+        "time": 8.0
+      },
+      {
+        "altitude": 14000.0,
+        "heading": 60.0,
+        "latitude": 48.8566,
+        "longitude": 2.3522,
+        "roll": 0.0,
+        "tilt": 55.0,
+        "time": 10.0
+      },
+      {
+        "altitude": 100000.0,
+        "heading": 90.0,
+        "latitude": 41.9028,
+        "longitude": 12.4964,
+        "roll": 0.0,
+        "tilt": 45.0,
+        "time": 12.1
+      },
+      {
+        "altitude": 50000.0,
+        "heading": 90.0,
+        "latitude": 41.9028,
+        "longitude": 12.4964,
+        "roll": 0.0,
+        "tilt": 30.0,
+        "time": 13.0
+      },
+      {
+        "altitude": 40000.0,
+        "heading": 105.0,
+        "latitude": 41.9028,
+        "longitude": 12.4964,
+        "roll": 0.0,
+        "tilt": 30.0,
+        "time": 15.0
+      }
+    ],
+    "settings": {
+      "atmosphere": true,
+      "fps": 30,
+      "motion_blur": true,
+      "quality": "high",
+      "resolution": {
+        "height": 1080,
+        "width": 1920
+      },
+      "stars": false
+    },
+    "title": "European Capitals"
+  },
+  "route": "europe",
+  "success": true
+}

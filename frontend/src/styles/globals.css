@@ -1,0 +1,89 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-slate-50 to-blue-50 font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-200;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-300 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-gray-200;
+  }
+
+  .btn-theme {
+    @apply bg-gradient-to-r from-white to-gray-50 hover:from-primary-50 hover:to-primary-100 text-gray-700 hover:text-primary-700 font-medium py-4 px-6 rounded-2xl border border-gray-200 hover:border-primary-300 shadow-sm hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-200;
+  }
+
+  .card {
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-200 transition-all duration-200 bg-white/80 backdrop-blur-sm;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-serif font-bold text-gray-800 mb-2;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-gray-600 mb-8;
+  }
+}
+
+.loading-dots::after {
+  content: '';
+  animation: ellipsis 1.25s infinite;
+}
+
+@keyframes ellipsis {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+.glass-effect {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-lg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-400 rounded-lg hover:bg-primary-500;
+}
+
+/* Map container styles */
+.map-container {
+  @apply relative overflow-hidden rounded-2xl shadow-2xl border border-white/20;
+}
+
+.map-container::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10 pointer-events-none;
+}

@@ -1,0 +1,13 @@
+flask
+flask-cors
+google-generativeai
+python-dotenv
+openai
+google-cloud-speech
+google-cloud-texttospeech
+googlemaps
+geopy
+pydantic
+requests
+aiohttp
+python-dotenv

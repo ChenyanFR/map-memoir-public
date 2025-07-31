@@ -1,0 +1,327 @@
+"""
+Google Earth Studio API routes
+Generates video projects from travel stories
+"""
+
+from flask import Blueprint, request, jsonify, send_file
+import asyncio
+import tempfile
+import os
+from datetime import datetime
+from services.earth_studio_service import earth_studio_service
+from services.ai_service import generate_timeline_from_locations, extract_locations_from_text
+from services.maps_service import maps_service
+
+# Create blueprint for Earth Studio routes
+earth_studio_bp = Blueprint('earth_studio', __name__)
+
+@earth_studio_bp.route('/api/earth-studio/create-project', methods=['POST'])
+def create_earth_studio_project():
+    """
+    Create Earth Studio project from locations and timeline
+    
+    Expected JSON body:
+    {
+        "locations": ["New York", "Paris", "Rome"],
+        "timeline": ["Chapter 1: Arrival in New York", ...],
+        "title": "My European Adventure",
+        "settings": {
+            "duration_per_location": 5,
+            "transition_style": "cinematic"
+        }
+    }
+    
+    Returns:
+    {
+        "project": {...},
+        "earth_studio_json": "...",
+        "download_url": "/api/earth-studio/download/{project_id}"
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'locations' not in data:
+            return jsonify({'error': 'Locations field is required'}), 400
+        
+        location_names = data['locations']
+        timeline = data.get('timeline', [])
+        title = data.get('title', f"Map Memoir Journey - {datetime.now().strftime('%Y%m%d')}")
+        
+        # Geocode locations if they're just names
+        if isinstance(location_names[0], str):
+            geocoded_locations = maps_service.geocode_locations(location_names)
+        else:
+            geocoded_locations = location_names
+        
+        # Filter out failed geocoding
+        valid_locations = [loc for loc in geocoded_locations if loc.get('latitude')]
+        
+        if len(valid_locations) < 2:
+            return jsonify({'error': 'Need at least 2 valid locations for Earth Studio project'}), 400
+        
+        # Generate Earth Studio project
+        project = earth_studio_service.generate_earth_studio_project(
+            valid_locations, timeline, title
+        )
+        
+        # Export to Earth Studio JSON
+        earth_studio_json = earth_studio_service.export_to_earth_studio_json(project)
+        
+        # Generate AI enhancement prompt
+        ai_prompt = earth_studio_service.generate_prompt_for_ai_enhancement(
+            valid_locations, timeline
+        )
+        
+        return jsonify({
+            'project': project.dict(),
+            'earth_studio_json': earth_studio_json,
+            'ai_enhancement_prompt': ai_prompt,
+            'location_count': len(valid_locations),
+            'total_duration': project.duration,
+            'keyframes_count': len(project.keyframes),
+            'status': 'success'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Earth Studio project creation failed: {str(e)}'}), 500
+
+@earth_studio_bp.route('/api/earth-studio/from-text', methods=['POST'])
+def create_from_text():
+    """
+    Create Earth Studio project from travel text description
+    
+    Expected JSON body:
+    {
+        "text": "My amazing journey from New York to Paris to Rome...",
+        "title": "European Adventure",
+        "video_style": "cinematic"
+    }
+    
+    Returns:
+    Complete Earth Studio project with extracted locations and generated timeline
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'text' not in data:
+            return jsonify({'error': 'Text field is required'}), 400
+        
+        text = data['text']
+        title = data.get('title', 'Map Memoir Journey')
+        video_style = data.get('video_style', 'cinematic')
+        
+        # Step 1: Extract locations using AI
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            extracted_locations = loop.run_until_complete(extract_locations_from_text(text))
+        finally:
+            loop.close()
+        
+        if not extracted_locations:
+            return jsonify({'error': 'No locations found in the text'}), 400
+        
+        # Step 2: Geocode locations
+        geocoded_locations = maps_service.geocode_locations(extracted_locations)
+        valid_locations = [loc for loc in geocoded_locations if loc.get('latitude')]
+        
+        # Step 3: Generate timeline
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            timeline_result = loop.run_until_complete(generate_timeline_from_locations(extracted_locations))
+            timeline = timeline_result.get('timeline', [])
+        finally:
+            loop.close()
+        
+        # Step 4: Create Earth Studio project
+        project = earth_studio_service.generate_earth_studio_project(
+            valid_locations, timeline, title
+        )
+        
+        # Step 5: Export to Earth Studio format
+        earth_studio_json = earth_studio_service.export_to_earth_studio_json(project)
+        
+        # Step 6: Generate AI enhancement suggestions
+        ai_prompt = earth_studio_service.generate_prompt_for_ai_enhancement(
+            valid_locations, timeline
+        )
+        
+        return jsonify({
+            'original_text': text,
+            'extracted_locations': extracted_locations,
+            'geocoded_locations': [loc.dict() if hasattr(loc, 'dict') else loc for loc in valid_locations],
+            'timeline': timeline,
+            'project': project.dict(),
+            'earth_studio_json': earth_studio_json,
+            'ai_enhancement_prompt': ai_prompt,
+            'video_style': video_style,
+            'stats': {
+                'locations_found': len(extracted_locations),
+                'locations_geocoded': len(valid_locations),
+                'timeline_events': len(timeline),
+                'video_duration': project.duration,
+                'keyframes': len(project.keyframes)
+            },
+            'status': 'success'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Text to Earth Studio conversion failed: {str(e)}'}), 500
+
+@earth_studio_bp.route('/api/earth-studio/download-project', methods=['POST'])
+def download_project():
+    """
+    Download Earth Studio project as JSON file
+    
+    Expected JSON body:
+    {
+        "project": {...},
+        "filename": "my_journey.json"
+    }
+    
+    Returns:
+    JSON file download
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'project' not in data:
+            return jsonify({'error': 'Project data is required'}), 400
+        
+        project_data = data['project']
+        filename = data.get('filename', f"earth_studio_project_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+        
+        # Create temporary file
+        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+        
+        # Convert project to Earth Studio JSON
+        if 'earth_studio_json' in data:
+            earth_studio_json = data['earth_studio_json']
+        else:
+            # Generate from project data
+            from services.earth_studio_service import EarthStudioProject
+            project_obj = EarthStudioProject(**project_data)
+            earth_studio_json = earth_studio_service.export_to_earth_studio_json(project_obj)
+        
+        # Write to temp file
+        temp_file.write(earth_studio_json)
+        temp_file.close()
+        
+        # Return file
+        return send_file(
+            temp_file.name,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/json'
+        )
+        
+    except Exception as e:
+        return jsonify({'error': f'Project download failed: {str(e)}'}), 500
+
+@earth_studio_bp.route('/api/earth-studio/preview', methods=['POST'])
+def preview_animation():
+    """
+    Generate preview information for Earth Studio animation
+    
+    Expected JSON body:
+    {
+        "locations": [...],
+        "timeline": [...]
+    }
+    
+    Returns:
+    {
+        "preview": {
+            "keyframes": [...],
+            "camera_path": [...],
+            "duration": 30.5,
+            "locations_coverage": [...]
+        }
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'locations' not in data:
+            return jsonify({'error': 'Locations field is required'}), 400
+        
+        locations = data['locations']
+        timeline = data.get('timeline', [])
+        
+        # Generate keyframes for preview
+        keyframes = earth_studio_service.calculate_camera_path(locations, timeline)
+        
+        # Create preview data
+        preview_data = {
+            'keyframes': [kf.dict() for kf in keyframes],
+            'duration': keyframes[-1].time if keyframes else 0,
+            'locations_count': len(locations),
+            'camera_positions': len(keyframes),
+            'estimated_render_time': f"{len(keyframes) * 2} minutes",
+            'flight_path': [
+                {
+                    'from': locations[i].get('name', f'Location {i}'),
+                    'to': locations[i+1].get('name', f'Location {i+1}'),
+                    'distance_km': 'calculated',
+                    'flight_time': f"{earth_studio_service.transition_duration}s"
+                }
+                for i in range(len(locations) - 1)
+            ]
+        }
+        
+        return jsonify({
+            'preview': preview_data,
+            'status': 'success'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Preview generation failed: {str(e)}'}), 500
+
+@earth_studio_bp.route('/api/earth-studio/test', methods=['GET'])
+def test_earth_studio():
+    """Test Earth Studio service"""
+    try:
+        # Test with sample data
+        test_locations = [
+            {'name': 'New York', 'latitude': 40.7128, 'longitude': -74.0060},
+            {'name': 'Paris', 'latitude': 48.8566, 'longitude': 2.3522},
+            {'name': 'Tokyo', 'latitude': 35.6762, 'longitude': 139.6503}
+        ]
+        
+        test_timeline = [
+            "Chapter 1: Departure from New York",
+            "Chapter 2: Arrival in Paris",
+            "Chapter 3: Journey to Tokyo"
+        ]
+        
+        # Generate test project
+        project = earth_studio_service.generate_earth_studio_project(
+            test_locations, test_timeline, "Test Journey"
+        )
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Earth Studio service is working',
+            'test_project': {
+                'title': project.title,
+                'duration': project.duration,
+                'keyframes_count': len(project.keyframes),
+                'locations_tested': len(test_locations)
+            },
+            'available_endpoints': [
+                '/api/earth-studio/create-project',
+                '/api/earth-studio/from-text',
+                '/api/earth-studio/download-project',
+                '/api/earth-studio/preview'
+            ]
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': f'Earth Studio test failed: {str(e)}'
+        }), 500

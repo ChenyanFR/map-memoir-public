@@ -1,0 +1,26 @@
+/* Fairy Tale Theme Video Effects */
+.video-container.fairy_tale {
+  border: 8px solid #f7c6ff;
+  box-shadow: 0 0 40px #e0aaff;
+  position: relative;
+}
+
+.fairy-tale-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: url('/overlays/fairy_tale_frame.png') center/cover no-repeat;
+  opacity: 0.7;
+  z-index: 2;
+}
+
+.fairy-tale-sparkle {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: radial-gradient(circle, #fff7d6 60%, transparent 100%);
+  animation: sparkle 2s infinite alternate;
+}
+@keyframes sparkle {
+  0% { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.5); }
+}
